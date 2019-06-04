@@ -5,7 +5,8 @@ from selenium.common.exceptions import StaleElementReferenceException
 import requests
 from bs4 import BeautifulSoup
 import time 
-import re
+import re 
+from operator import itemgetter 
 
 blogId = "jhc9639"
 postNumber = "221492245737"
@@ -26,28 +27,45 @@ def getPage(url):
     req = requests.get(url)
     return BeautifulSoup(req.text, 'html.parser') 
 
-ret = getPage(url)
-code = ret.find_all("div", class_='se-code-source')
-result = "" 
+def find_idx(a, b):
+    return a.index(b) 
+
+ret = getPage(url) 
+result_arr = []
+
+title = ret.find("div", class_="se-title-text")
+result_arr.append({"name" : "title", "content" : title.text.strip()}) 
+
+code = ret.find_all("div", class_='se-code-source') 
 for tag in code:
-    result += "```"
-    result += tag.text
-    result += "```" 
-    result += "\n" 
+    result_arr.append({"name" : "code", "content" : tag.text}) 
  
 blockquote_tag = ret.find_all("blockquote")
 for tag in blockquote_tag:  
     if bool(re.search('[가-힣]|[a-z]|[0-9]',tag.text)):
-        result += "# " + tag.text.strip()
-        result += "\n" 
+        result_arr.append({"name" : "blockquote", "content" : tag.text.strip()})  
 
 p_tag = ret.find_all("div", class_="se-section-text")
 for tag in p_tag:  
     if bool(re.search('[가-힣]|[a-z]|[0-9]',tag.text)):
-        result += tag.text 
-        result += "\n" 
+        print(tag.text)
+        result_arr.append({"name" : "content", "content" : tag.text})    
 
-print(result) 
+for i in range(len(result_arr)): 
+    idx = find_idx(ret.text, result_arr[i]['content'])  
+    result_arr[i]['idx'] = idx;  
+    
+newlist = sorted(result_arr, key=itemgetter('idx')) 
+result = "" 
+for item in newlist: 
+    if item['name'] == 'title':
+        result += ("# " + item['content'] + " \n")
+    elif item['name'] == 'code':
+        result += ("```\n" + item['content'] + "\n```\n")
+    elif item['name'] == 'blockquote':
+        result += ("## " + item['content'] + " \n") 
+    elif item['name'] == 'content':
+        result += (item['content'] + "\n")
 f = open("./kundol.md", mode = 'w' , encoding='utf8')
 f.write(result)
 f.close() 
