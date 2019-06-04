@@ -11,7 +11,7 @@ pip install requests
 ## 오류발생시 확인 할 목록
 자신이 사용하고 있는 크롬버전에 맞는 chromedriver를 설치하는 것이 중요하다.  
 <p align="center"> 
-  <img src="https://raw.githubusercontent.com/wnghdcjfe/naverBlogToMarkdown/master/img/a.png" width="700">
+  <img src="https://raw.githubusercontent.com/wnghdcjfe/naverBlogToMarkdown/master/img/a.PNG" width="700">
 </p> 
 
 <p align="center"> 
